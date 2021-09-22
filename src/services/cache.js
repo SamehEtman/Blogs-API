@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
+const keys = require('../keys/key')
 
 const redis = require('redis');
 
-const redisUrl = 'redis://127.0.0.1:6379';
+const redisUrl = keys.redisUrl;
 
 const client = redis.createClient(redisUrl);
 const util = require('util');
@@ -24,7 +25,6 @@ mongoose.Query.prototype.exec = async function () {
     })
   );
   const cachedItems = await client.hget(this.hashKey, key);
-  console.log(this.hashKey);
   if (cachedItems) {
     const docs = JSON.parse(cachedItems);
     console.log('from cache');

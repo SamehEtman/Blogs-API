@@ -7,6 +7,7 @@ services :
   - redis-server
 env :
   - PORT=3000
+  - NODE_ENV=ci
 cache:
   directories:
     - node_modules
