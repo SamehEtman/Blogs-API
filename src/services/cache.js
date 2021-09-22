@@ -9,9 +9,10 @@ const util = require('util');
 client.hget = util.promisify(client.hget);
 
 const exec = mongoose.Query.prototype.exec;
+
 mongoose.Query.prototype.cache = function (options) {
   this.isCache = true;
-  this.hashKey = JSON.stringify(options);
+  this.hashKey = JSON.stringify(options.key);
   return this;
 };
 mongoose.Query.prototype.exec = async function () {
@@ -23,6 +24,7 @@ mongoose.Query.prototype.exec = async function () {
     })
   );
   const cachedItems = await client.hget(this.hashKey, key);
+  console.log(this.hashKey);
   if (cachedItems) {
     const docs = JSON.parse(cachedItems);
     console.log('from cache');
@@ -34,4 +36,19 @@ mongoose.Query.prototype.exec = async function () {
   const results = await exec.apply(this, arguments);
   client.hset(this.hashKey, key, JSON.stringify(results), 'EX', 30);
   return results;
+};
+
+const clearCache = (key) => {
+  client.del(JSON.stringify(key));
+  console.log('chache cleared');
+};
+
+const closeRedis = () => {
+  client.flushall();
+  client.quit();
+};
+
+module.exports = {
+  clearCache,
+  closeRedis,
 };

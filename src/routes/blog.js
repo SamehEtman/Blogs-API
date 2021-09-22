@@ -1,8 +1,8 @@
 const express = require('express');
 const auth = require('../middlewares/auth');
 const Blog = require('../models/Blog');
+const clearCache = require('../middlewares/clearCache')
 const router = express.Router();
-
 
 
 router.get('/blogs', auth, async (req, res, next) => {
@@ -20,7 +20,7 @@ router.get('/blogs', auth, async (req, res, next) => {
   }
 });
 
-router.post('/blog', auth, async (req, res, next) => {
+router.post('/blog', auth, clearCache , async (req, res, next) => {
   try {
     const blog = new Blog({ ...req.body, _user: req.user._id });
     await blog.save();

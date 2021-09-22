@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const keys = require('../../src/keys/dev');
 const Blog = require('../../src/models/Blog');
 const User = require('../../src/models/User');
-
+const { closeRedis } = require('../../src/services/cache');
 const connectTestDB = async () => {
   await mongoose.connect(keys.mongoURITest, {
     useNewUrlParser: true,
@@ -11,6 +11,9 @@ const connectTestDB = async () => {
 };
 const disconnectTestDB = async () => {
   await mongoose.connection.close();
+};
+const diconnectRedis = () => {
+  closeRedis();
 };
 const userId = mongoose.Types.ObjectId();
 
@@ -50,4 +53,5 @@ module.exports = {
   connectTestDB,
   setUpEnv,
   disconnectTestDB,
+  diconnectRedis,
 };

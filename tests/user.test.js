@@ -2,9 +2,17 @@ const request = require('supertest');
 const app = require('../app');
 const data = require('./fixtures/dp');
 
-beforeAll(data.connectTestDB);
+beforeAll((done) => {
+  data.connectTestDB();
+  done();
+});
 beforeEach(data.setUpEnv);
-afterAll(data.disconnectTestDB);
+
+afterAll((done) => {
+  data.disconnectTestDB();
+  data.diconnectRedis();
+  done();
+});
 
 test('Should sign up non-existing user', async () => {
   const response = await request(app)
