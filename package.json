@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
-    "start" : "node index.js",
+    "start": "node index.js",
     "test": "jest"
   },
   "jest": {
@@ -15,12 +15,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.995.0",
     "express": "^4.17.1",
     "jest": "^27.2.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.0.7",
     "nodemon": "^2.0.12",
     "redis": "^3.1.2",
-    "supertest": "^6.1.6"
+    "supertest": "^6.1.6",
+    "uuid": "^8.3.2"
   }
 }

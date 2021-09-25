@@ -1,16 +1,16 @@
 language: node_js
 node_js:
   - '14'
-dist: trusty
+dist:
+  - trusty
 services:
   - mongodb
   - redis
 env:
   - PORT=3000
-  - Node_ENV=ci
+  - NODE_ENV=ci
 cache:
-  dirctories:
-    - node_modules
+  directories: - node_modules
 install:
   - npm install
 script:
