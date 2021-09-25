@@ -1,54 +1,48 @@
 const mongoose = require('mongoose');
-const keys = require('../keys/key')
-
 const redis = require('redis');
-
-const redisUrl = keys.redisUrl;
-
-const client = redis.createClient(redisUrl);
 const util = require('util');
+const keys = require('../keys/key');
+
+const client = redis.createClient(keys.redisUrl);
+
 client.hget = util.promisify(client.hget);
 
 const exec = mongoose.Query.prototype.exec;
 
 mongoose.Query.prototype.cache = function (options) {
   this.isCache = true;
-  this.hashKey = JSON.stringify(options.key);
+  this.hKey = JSON.stringify(options.key);
   return this;
 };
+
 mongoose.Query.prototype.exec = async function () {
   if (!this.isCache) return exec.apply(this, arguments);
 
-  const key = JSON.stringify(
+  const query = JSON.stringify(
     Object.assign({}, this.getQuery(), {
       collection: this.mongooseCollection.name,
     })
   );
-  const cachedItems = await client.hget(this.hashKey, key);
-  if (cachedItems) {
-    const docs = JSON.parse(cachedItems);
-    console.log('from cache');
+  const items = await client.hget(this.hKey, query);
+
+  if (items) {
+    const docs = JSON.parse(items);
+
     return Array.isArray(docs)
-      ? docs.map((doc) => new this.model(doc))
-      : new this.model(docs);
+      ? docs.map((doc) => this.model(doc))
+      : this.model(docs);
   }
-  console.log('from mongo');
+
   const results = await exec.apply(this, arguments);
-  client.hset(this.hashKey, key, JSON.stringify(results), 'EX', 30);
+  client.hset(this.hKey, query, JSON.stringify(results), 'EX', 10);
   return results;
 };
 
-const clearCache = (key) => {
-  client.del(JSON.stringify(key));
-  console.log('chache cleared');
-};
-
-const closeRedis = () => {
-  client.flushall();
-  client.quit();
-};
-
 module.exports = {
-  clearCache,
-  closeRedis,
+  clearCache(key) {
+    client.del(JSON.stringify(key));
+  },
+  closeRedis() {
+    client.quit();
+  },
 };

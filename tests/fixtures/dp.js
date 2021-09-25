@@ -3,6 +3,7 @@ const keys = require('../../src/keys/dev');
 const Blog = require('../../src/models/Blog');
 const User = require('../../src/models/User');
 const { closeRedis } = require('../../src/services/cache');
+
 const connectTestDB = async () => {
   await mongoose.connect(keys.mongoURITest, {
     useNewUrlParser: true,
