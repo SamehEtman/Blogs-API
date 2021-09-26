@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  redis_db:
+    image: redis
+    networks:
+      - webnet
+  app:
+    container_name: docker-node-redis
+    restart: always
+    build: .
+    ports:
+      - '3000:3000'
+    links:
+      - redis_db
+    networks:
+      - webnet
+    depends_on:
+      - redis_db
+  
+networks:
+  webnet:    
